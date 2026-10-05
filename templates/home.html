@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% comment %}
+    Homepage. The shell (head, fonts, navbar, active-underline) now lives in
+    base.html; this file holds only the hero.
+{% endcomment %}
+
+{% block content %}
+
+    <main class="hero">
+
+        <div class="hero-content">
+
+            <p class="eyebrow">
+                THE LEGEND RETURNS
+            </p>
+
+
+            <h1>
+                BMW <span>M3</span> E30
+            </h1>
+
+
+            <p class="subtitle">
+                BORN FOR THE ROAD.<br>
+                BUILT FOR PERFORMANCE.
+            </p>
+
+
+            <!-- EXPLORE COLLECTION -->
+            <a
+                class="btn"
+                href="{% url 'collection' %}">
+
+                EXPLORE COLLECTION
+
+                <span
+                    class="btn__arrow"
+                    aria-hidden="true">
+                    &rarr;
+                </span>
+
+            </a>
+
+        </div>
+
+    </main>
+
+{% endblock %}

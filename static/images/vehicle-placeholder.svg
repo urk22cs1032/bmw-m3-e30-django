@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500" role="img" aria-label="Vehicle photograph unavailable">
+  <!--
+    Single neutral placeholder for vehicles with no uploaded image.
+    Deliberately unbranded: grey silhouette only, no BMW roundel, no red, and
+    no reuse of the homepage hero photograph. 16:10 so it fills the card media
+    box exactly at every breakpoint with nothing cropped.
+  -->
+  <defs>
+    <linearGradient id="ph-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#17181c"/>
+      <stop offset="100%" stop-color="#0a0b0d"/>
+    </linearGradient>
+    <linearGradient id="ph-body" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#3c4046"/>
+      <stop offset="52%" stop-color="#2a2d32"/>
+      <stop offset="100%" stop-color="#1a1c20"/>
+    </linearGradient>
+    <linearGradient id="ph-glass" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#2a2e35"/>
+      <stop offset="100%" stop-color="#1d2025"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="800" height="500" fill="url(#ph-bg)"/>
+
+  <!-- floor contact -->
+  <ellipse cx="400" cy="368" rx="286" ry="15" fill="#000000" opacity="0.5"/>
+
+  <!-- body -->
+  <path d="M 92 356 L 92 318 Q 92 286 118 278 L 214 258 L 288 186 L 452 178 L 546 214 L 624 262 L 694 280 Q 716 290 714 320 L 712 356 Z"
+        fill="url(#ph-body)" stroke="#4e535c" stroke-width="2" stroke-linejoin="round"/>
+
+  <!-- greenhouse -->
+  <path d="M 240 250 L 302 198 L 446 190 L 534 222 L 246 252 Z"
+        fill="url(#ph-glass)" stroke="#3f444c" stroke-width="1.5" stroke-linejoin="round"/>
+  <line x1="400" y1="192" x2="398" y2="247" stroke="#3f444c" stroke-width="2"/>
+
+  <!-- belt line + sill -->
+  <line x1="118" y1="268" x2="694" y2="292" stroke="#454a52" stroke-width="1.5"/>
+  <line x1="150" y1="330" x2="660" y2="330" stroke="#33373d" stroke-width="1.5"/>
+
+  <!-- wheels -->
+  <g>
+    <circle cx="222" cy="356" r="60" fill="#101114" stroke="#4e535c" stroke-width="2"/>
+    <circle cx="222" cy="356" r="31" fill="#2b2e34" stroke="#5b616b" stroke-width="2"/>
+    <circle cx="222" cy="356" r="8" fill="#4e535c"/>
+  </g>
+  <g>
+    <circle cx="580" cy="356" r="60" fill="#101114" stroke="#4e535c" stroke-width="2"/>
+    <circle cx="580" cy="356" r="31" fill="#2b2e34" stroke="#5b616b" stroke-width="2"/>
+    <circle cx="580" cy="356" r="8" fill="#4e535c"/>
+  </g>
+</svg>

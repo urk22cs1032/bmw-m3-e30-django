@@ -1,0 +1,228 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% comment %}
+    Add / edit form for one vehicle. Extends base.html so the navbar, fonts and
+    active underline stay identical to every other page -- a standalone
+    <!DOCTYPE html> here is exactly how this form ended up with a 404 logo and
+    an unstyled navbar in the first place.
+{% endcomment %}
+
+{% block title %}{{ page_title }} | BMW M3 E30{% endblock %}
+
+{% block description %}{{ page_title }} for the BMW M3 E30 showroom collection.{% endblock %}
+
+{% block content %}
+
+    {% comment %}
+        `edit-page` is added only when a record is being edited, which is the one
+        thing this template's two callers disagree about. The add form and the
+        edit form share this file and render identical markup otherwise, so
+        without a class on <main> there is no way to style one of them without
+        styling the other -- and the add form is explicitly not to change.
+
+        On the add page `vehicle` is None, so this renders to exactly the class
+        list it always had: `page page--form content-page--form`.
+    {% endcomment %}
+    <main class="page page--form content-page--form{% if vehicle %} edit-page{% endif %}">
+        <div class="page__scroll">
+
+        <header class="content-header">
+            <p class="eyebrow">
+                BMW MANAGEMENT
+            </p>
+
+            <h1 class="content-title">
+                {{ page_title|upper }}
+            </h1>
+
+            <p class="content-sub">
+                {% if vehicle %}
+                    Editing {{ vehicle.bmw_id }} &mdash; {{ vehicle.model }} ({{ vehicle.year }}).
+                    Changes go live immediately.
+                {% else %}
+                    Create a new record. Anything left blank is simply not shown
+                    on the collection card.
+                {% endif %}
+            </p>
+        </header>
+
+        {% comment %}
+            novalidate is deliberately NOT set. The browser's own required and
+            number checks give instant feedback before a round trip; the server
+            still re-validates everything and is the only thing that can catch a
+            duplicate BMW ID.
+        {% endcomment %}
+        <form method="post" enctype="multipart/form-data" class="v-form">
+            {% csrf_token %}
+
+            {% comment %}
+                Bound-form errors are one <ul>; the template below styles the
+                <li>s, so the list markers have to be removed. role="alert"
+                makes a screen reader announce the failure on submit.
+            {% endcomment %}
+            {% if form.non_field_errors %}
+                <div class="v-form__errors" role="alert">
+                    <p class="v-form__errors-title">PLEASE FIX THE FOLLOWING</p>
+                    <ul>
+                        {% for error in form.non_field_errors %}<li>{{ error }}</li>{% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+
+            <div class="v-form__grid">
+
+                {% comment %}
+                    Rendered by hand rather than with a {{ form }} loop, so each
+                    field can carry the right label, the right placeholder hint
+                    and its own error slot. `v-field--error` is what turns the
+                    input red.
+
+                    The error <p> is placed directly after its input inside the
+                    same labelled group, so a screen reader reaches it on the
+                    next tab stop without needing an aria-describedby link. The
+                    id on it is a stable anchor for styling and for tests.
+                {% endcomment %}
+
+                <div class="v-field {% if form.bmw_id.errors %}v-field--error{% endif %}">
+                    <label for="{{ form.bmw_id.id_for_label }}">BMW ID</label>
+                    {{ form.bmw_id }}
+                    {% if form.bmw_id.errors %}
+                        <p class="v-field__error" id="{{ form.bmw_id.id_for_label }}-err">{{ form.bmw_id.errors|join:" " }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="v-field {% if form.model.errors %}v-field--error{% endif %}">
+                    <label for="{{ form.model.id_for_label }}">MODEL</label>
+                    {{ form.model }}
+                    {% if form.model.errors %}
+                        <p class="v-field__error" id="{{ form.model.id_for_label }}-err">{{ form.model.errors|join:" " }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="v-field {% if form.year.errors %}v-field--error{% endif %}">
+                    <label for="{{ form.year.id_for_label }}">YEAR</label>
+                    {{ form.year }}
+                    {% if form.year.errors %}
+                        <p class="v-field__error" id="{{ form.year.id_for_label }}-err">{{ form.year.errors|join:" " }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="v-field {% if form.variant.errors %}v-field--error{% endif %}">
+                    <label for="{{ form.variant.id_for_label }}">VARIANT</label>
+                    {{ form.variant }}
+                    {% if form.variant.errors %}
+                        <p class="v-field__error" id="{{ form.variant.id_for_label }}-err">{{ form.variant.errors|join:" " }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="v-field {% if form.status.errors %}v-field--error{% endif %}">
+                    <label for="{{ form.status.id_for_label }}">STATUS</label>
+                    {{ form.status }}
+                    {% if form.status.errors %}
+                        <p class="v-field__error" id="{{ form.status.id_for_label }}-err">{{ form.status.errors|join:" " }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="v-field {% if form.price.errors %}v-field--error{% endif %}">
+                    <label for="{{ form.price.id_for_label }}">PRICE</label>
+                    <div class="v-field__prefixed">
+                        <span class="v-field__prefix" aria-hidden="true">&#8377;</span>
+                        {{ form.price }}
+                    </div>
+                    {% if form.price.errors %}
+                        <p class="v-field__error" id="{{ form.price.id_for_label }}-err">{{ form.price.errors|join:" " }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="v-field {% if form.customer_name.errors %}v-field--error{% endif %}">
+                    <label for="{{ form.customer_name.id_for_label }}">CUSTOMER NAME</label>
+                    {{ form.customer_name }}
+                    {% if form.customer_name.errors %}
+                        <p class="v-field__error" id="{{ form.customer_name.id_for_label }}-err">{{ form.customer_name.errors|join:" " }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="v-field {% if form.registration_number.errors %}v-field--error{% endif %}">
+                    <label for="{{ form.registration_number.id_for_label }}">REGISTRATION NUMBER</label>
+                    {{ form.registration_number }}
+                    {% if form.registration_number.errors %}
+                        <p class="v-field__error" id="{{ form.registration_number.id_for_label }}-err">{{ form.registration_number.errors|join:" " }}</p>
+                    {% endif %}
+                </div>
+
+                <div class="v-field v-field--wide {% if form.image.errors %}v-field--error{% endif %}">
+                    <label for="{{ form.image.id_for_label }}">VEHICLE IMAGE</label>
+
+                    {% comment %}
+                        On edit, show what is stored now. Without this the file
+                        input's "Currently: ..." line is the only clue, and it
+                        does not look like the card, so it is impossible to tell
+                        which photo the record is actually using.
+                    {% endcomment %}
+                    <div class="v-upload">
+                        <div class="v-upload__preview">
+                            {% comment %}
+                                Same neutral placeholder the card uses when a
+                                record has no photo, so this preview matches
+                                what the public page will show rather than
+                                showing an empty box that reads as a bug.
+
+                                This is {% comment %}, not {# ... #}: Django's
+                                lexer only matches the single-line form, so a
+                                newline inside one leaves the opening text in the
+                                output where it renders as visible garbage.
+                            {% endcomment %}
+                            {% if vehicle and vehicle.image %}
+                                <img src="{{ vehicle.image.url }}" alt="Current photo of {{ vehicle.model }}">
+                            {% else %}
+                                <img src="{% static 'images/vehicle-placeholder.svg' %}"
+                                     alt="No photograph stored yet">
+                            {% endif %}
+                        </div>
+
+                        <div class="v-upload__controls">
+                            {{ form.image }}
+
+                            {% comment %}
+                                Only mention keeping the current photo when there
+                                is one. On the add form this sentence told the
+                                visitor to leave the field empty to keep a photo
+                                that does not exist yet.
+                            {% endcomment %}
+                            <p class="v-upload__hint">
+                                {% if vehicle and vehicle.image %}
+                                    JPEG or PNG. Leave empty to keep the current photo.
+                                {% else %}
+                                    JPEG or PNG. Optional &mdash; the card shows a
+                                    placeholder without it.
+                                {% endif %}
+                            </p>
+                        </div>
+                    </div>
+
+                    {% if form.image.errors %}
+                        <p class="v-field__error" id="{{ form.image.id_for_label }}-err">{{ form.image.errors|join:" " }}</p>
+                    {% endif %}
+                </div>
+
+            </div>
+
+            <div class="v-form__actions">
+                <button type="submit" class="btn">
+                    {{ submit_text }}
+                    <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+                </button>
+
+                {% if vehicle %}
+                    <a class="btn btn--ghost" href="{% url 'vehicle_detail' vehicle.pk %}">CANCEL</a>
+                {% else %}
+                    <a class="btn btn--ghost" href="{% url 'management' %}">CANCEL</a>
+                {% endif %}
+            </div>
+        </form>
+
+        </div>
+    </main>
+
+{% endblock %}

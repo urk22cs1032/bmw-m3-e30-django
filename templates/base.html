@@ -1,0 +1,170 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="theme-color" content="#050505">
+    <meta name="description" content="{% block description %}BMW M3 E30 — the legend returns. Born for the road, built for performance.{% endblock %}">
+
+    <title>{% block title %}BMW M3 E30{% endblock %}</title>
+
+    {% comment %}
+        Declaring the icon stops the browser falling back to its own
+        /favicon.ico probe, which 404s because this project ships none.
+    {% endcomment %}
+    <link rel="icon" type="image/svg+xml" href="{% static 'images/favicon.svg' %}">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Archivo:wght@500;600;700;800;900&family=Barlow:wght@400;500;600&display=swap">
+
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+
+    {% block head %}{% endblock %}
+</head>
+
+<body class="{% block body_class %}{% endblock %}">
+
+    <nav class="navbar">
+
+        <a class="logo" href="{% url 'home' %}" aria-label="BMW home">
+
+            <svg class="logo__roundel"
+                 viewBox="0 0 100 100"
+                 aria-hidden="true"
+                 focusable="false">
+
+                <defs>
+                    <path id="bmwRingPath"
+                          fill="none"
+                          d="M 10 50 A 40 40 0 1 1 90 50 A 40 40 0 1 1 10 50"/>
+                </defs>
+
+                <circle cx="50" cy="50" r="48" fill="url(#ringFace)"/>
+
+                <circle cx="50"
+                        cy="50"
+                        r="48"
+                        fill="none"
+                        stroke="rgba(255,255,255,.28)"
+                        stroke-width="1.5"/>
+
+                <text class="logo__ring-text">
+                    <textPath href="#bmwRingPath"
+                              startOffset="25%"
+                              text-anchor="middle">
+                        BMW
+                    </textPath>
+                </text>
+
+                <path d="M 50 50 L 50 13 A 37 37 0 0 0 13 50 Z"
+                      fill="#ffffff"/>
+
+                <path d="M 50 50 L 50 13 A 37 37 0 0 1 87 50 Z"
+                      fill="#0066b1"/>
+
+                <path d="M 50 50 L 13 50 A 37 37 0 0 0 50 87 Z"
+                      fill="#0066b1"/>
+
+                <path d="M 50 50 L 50 87 A 37 37 0 0 0 87 50 Z"
+                      fill="#ffffff"/>
+
+                <circle cx="50"
+                        cy="50"
+                        r="37"
+                        fill="none"
+                        stroke="rgba(255,255,255,.35)"
+                        stroke-width="1.5"/>
+
+                <defs>
+                    <linearGradient id="ringFace"
+                                    x1="0"
+                                    y1="0"
+                                    x2="0"
+                                    y2="1">
+                        <stop offset="0%" stop-color="#1a1c20"/>
+                        <stop offset="100%" stop-color="#000000"/>
+                    </linearGradient>
+                </defs>
+
+            </svg>
+
+            <span class="logo__word">BMW</span>
+        </a>
+
+
+        {% with current=request.resolver_match.url_name %}
+
+        <div class="nav-links">
+
+            <!-- HOME -->
+            <a href="{% url 'home' %}"
+               {% if current == 'home' %}aria-current="page"{% endif %}>
+                HOME
+            </a>
+
+
+            <!-- COLLECTION -->
+            <a href="{% url 'collection' %}"
+               {% if current == 'collection' or current == 'vehicle_detail' %}aria-current="page"{% endif %}>
+                COLLECTION
+            </a>
+
+
+            <!-- ABOUT -->
+            <a href="{% url 'about' %}"
+               {% if current == 'about' %}aria-current="page"{% endif %}>
+                ABOUT
+            </a>
+
+
+            <!-- MANAGEMENT -->
+            {% if user.is_authenticated %}
+
+                <a href="{% url 'management' %}"
+                   {% if current == 'management' or current == 'vehicle_add' or current == 'vehicle_edit' or current == 'vehicle_delete' %}aria-current="page"{% endif %}>
+                    MANAGEMENT
+                </a>
+
+            {% else %}
+
+                <a href="{% url 'login' %}?next={% url 'management' %}"
+                   class="nav-link--locked"
+                   title="Login required">
+                    MANAGEMENT
+                    <span class="lock-icon" aria-hidden="true">🔒</span>
+                </a>
+
+            {% endif %}
+
+
+            <!-- LOGIN / LOGOUT -->
+            {% if user.is_authenticated %}
+
+                <a href="{% url 'logout' %}">
+                    LOGOUT
+                </a>
+
+            {% else %}
+
+                <a href="{% url 'login' %}"
+                   {% if current == 'login' %}aria-current="page"{% endif %}>
+                    LOGIN
+                </a>
+
+            {% endif %}
+
+        </div>
+
+        {% endwith %}
+
+    </nav>
+
+
+    {% block content %}{% endblock %}
+
+</body>
+</html>

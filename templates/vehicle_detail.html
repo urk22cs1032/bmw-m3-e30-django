@@ -1,0 +1,150 @@
+{% extends "base.html" %}
+{% load static %}
+{% load collection_tags %}
+
+{% block title %}{{ vehicle.bmw_id }} — BMW M3 E30{% endblock %}
+
+{% block description %}{{ vehicle.model }} — BMW M3 E30.{% endblock %}
+
+{% block content %}
+
+    {% comment %}
+        One centred frame, two columns: the photograph on the left at a fixed
+        aspect ratio, the record on the right. The frame is a fixed width, so a
+        long model name or a long registration number wraps inside it instead of
+        stretching the card to fit — which is what used to happen when the image
+        and the copy were stacked in a single 880px column.
+
+        "Series" from the design brief is deliberately absent: the Vehicle model
+        has no series field, and inventing one would mean a migration, which
+        this task explicitly rules out. Every field the database actually has is
+        shown instead.
+    {% endcomment %}
+    {% comment %}
+        `vehicle-detail-page` is a scoping hook only. It is added alongside the
+        existing `page page--detail` rather than replacing anything, so every
+        rule that already matched this page still matches it, and the fixed-frame
+        rules that need to reach this page and no other can use this class.
+    {% endcomment %}
+    <main class="page page--detail vehicle-detail-page">
+        <div class="page__scroll">
+
+            <a class="back-link" href="{% url 'collection' %}">&larr; BACK TO COLLECTION</a>
+
+            <article class="detail-frame">
+
+                {% comment %}
+                    The media is its own frame at a locked aspect ratio with
+                    object-fit: cover, so a portrait phone snap and a landscape
+                    press shot fill the same box and no two vehicles differ in
+                    image size. Uploaded photo when there is one, otherwise the
+                    neutral placeholder — never the roundel or the hero.
+                {% endcomment %}
+                <div class="detail-frame__media">
+                    <div class="detail-media">
+                        {% if vehicle.image %}
+                            <img src="{{ vehicle.image.url }}"
+                                 alt="{{ vehicle.model }}"
+                                 decoding="async">
+                        {% else %}
+                            <img src="{% static 'images/vehicle-placeholder.svg' %}"
+                                 alt="No photograph available for {{ vehicle.model }}"
+                                 decoding="async">
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="detail-frame__body">
+
+                    <div class="detail-head">
+                        <p class="eyebrow">{{ vehicle.bmw_id }}</p>
+
+                        <h1 class="detail-title">{{ vehicle.model }}</h1>
+
+                        <p class="detail-variant">
+                            {{ vehicle.year }}{% if vehicle.variant %} &middot; {{ vehicle.variant }}{% endif %}
+                        </p>
+                    </div>
+
+                    <div class="detail-foot">
+                        <p class="card-price detail-price">{{ vehicle.price|inr }}</p>
+                        <span class="status" data-status="{{ vehicle.status }}">{{ vehicle.get_status_display }}</span>
+                    </div>
+
+                    {% comment %}
+                        min-width:0 on every cell is what stops a long value
+                        widening the column; the CSS lets it wrap and, where a
+                        single token would still overflow, breaks inside it.
+                    {% endcomment %}
+                    <dl class="detail-grid">
+                        <div class="detail-field">
+                            <dt class="detail-field__label">BMW ID</dt>
+                            <dd class="detail-field__value">{{ vehicle.bmw_id }}</dd>
+                        </div>
+                        <div class="detail-field">
+                            <dt class="detail-field__label">YEAR</dt>
+                            <dd class="detail-field__value">{{ vehicle.year }}</dd>
+                        </div>
+                        <div class="detail-field">
+                            <dt class="detail-field__label">VARIANT</dt>
+                            <dd class="detail-field__value">{{ vehicle.variant|default:"—" }}</dd>
+                        </div>
+                        <div class="detail-field">
+                            <dt class="detail-field__label">STATUS</dt>
+                            <dd class="detail-field__value">{{ vehicle.get_status_display }}</dd>
+                        </div>
+                        <div class="detail-field">
+                            <dt class="detail-field__label">CUSTOMER</dt>
+                            <dd class="detail-field__value">{{ vehicle.customer_name|default:"—" }}</dd>
+                        </div>
+                        <div class="detail-field">
+                            <dt class="detail-field__label">REGISTRATION</dt>
+                            <dd class="detail-field__value">{{ vehicle.registration_number|default:"—" }}</dd>
+                        </div>
+                        <div class="detail-field">
+                            <dt class="detail-field__label">PRICE</dt>
+                            <dd class="detail-field__value detail-field__value--price">{{ vehicle.price|inr }}</dd>
+                        </div>
+                        <div class="detail-field">
+                            <dt class="detail-field__label">ADDED</dt>
+                            <dd class="detail-field__value">{{ vehicle.created_at|date:"d M Y" }}</dd>
+                        </div>
+                    </dl>
+
+                    {% comment %}
+                        Edit and delete live here rather than on the collection
+                        card. The card's design is fixed by the brief — image,
+                        model, year, variant, price, status and a single VIEW
+                        DETAILS action — and a grid of cards each carrying a red
+                        destructive button would turn the page into a wall of
+                        red. One record, one set of actions.
+                    {% endcomment %}
+                    {% comment %}
+                        Labels follow the brief's wording. The targets, and
+                        therefore the behaviour, are unchanged — the same three
+                        URLs the page has always offered.
+                    {% endcomment %}
+                    <div class="detail-actions">
+                        <a class="btn" href="{% url 'collection' %}">
+                            BACK TO COLLECTION
+                            <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+                        </a>
+
+                        <a class="btn btn--red" href="{% url 'vehicle_edit' vehicle.pk %}">
+                            EDIT VEHICLE
+                            <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+                        </a>
+
+                        <a class="btn btn--danger" href="{% url 'vehicle_delete' vehicle.pk %}">
+                            DELETE VEHICLE
+                            <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+                        </a>
+                    </div>
+
+                </div>
+            </article>
+
+        </div>
+    </main>
+
+{% endblock %}

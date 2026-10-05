@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% load static %}
+{% load collection_tags %}
+
+{% comment %}
+    Collection page — redesigned shell.
+
+    Layout contract, and the reason this file's structure matters more than its
+    markup: this page must never scroll as a document. The frame is exactly one
+    viewport tall (see `.page--collection` in the stylesheet), the navbar, the
+    collection heading and the filter/search bar are all flex children of that
+    frame, so they physically cannot move, and the ONLY scroll container is
+    `.collection-scroll`, which holds the vehicle grid and nothing else.
+
+    Everything that makes the page work is still the backend's: the grid loops
+    over the real `vehicles` queryset, the status filters are plain links
+    carrying ?status=, and the search is a plain GET form carrying ?q= and the
+    active status through a hidden field. JavaScript is not involved anywhere,
+    so filtering and searching work with it disabled and a filtered result is a
+    real shareable URL.
+{% endcomment %}
+
+{% block title %}Our Collection — BMW M3 E30{% endblock %}
+
+{% block description %}Our collection — explore the iconic BMW M3 E30 models.{% endblock %}
+
+{% block content %}
+
+    <main class="page page--collection">
+
+        {% comment %}
+            Fixed heading. The red rule before the eyebrow, the eyebrow itself,
+            and the two-tone title are all styled in section 23 of the
+            stylesheet, scoped to `.page--collection` so no other page can be
+            reached from here.
+        {% endcomment %}
+        <header class="collection-header">
+            <p class="collection-eyebrow"><span class="collection-rule" aria-hidden="true"></span>BMW M3 E30</p>
+
+            <h1 class="collection-title">OUR <span class="collection-title__accent">COLLECTION</span></h1>
+
+            <p class="collection-sub">EXPLORE THE ICONIC BMW M3 E30 MODELS</p>
+        </header>
+
+        {% comment %}
+            One compact control bar: status filters on the left, search on the
+            right. Both are GET-only, so the two halves stay independent —
+            a filter link carries the current query through, and the search form
+            carries the current status through.
+        {% endcomment %}
+        <div class="collection-toolbar">
+
+            <nav class="filter-bar" aria-label="Filter vehicles by status">
+                <a class="filter{% if not status %} is-active{% endif %}"
+                   aria-current="{% if not status %}true{% endif %}"
+                   href="{% if query %}?q={{ query|urlencode }}{% endif %}">ALL</a>
+                <a class="filter{% if status == 'PENDING' %} is-active{% endif %}"
+                   aria-current="{% if status == 'PENDING' %}true{% endif %}"
+                   href="?status=PENDING{% if query %}&amp;q={{ query|urlencode }}{% endif %}">PENDING</a>
+                <a class="filter{% if status == 'IN_PROCESS' %} is-active{% endif %}"
+                   aria-current="{% if status == 'IN_PROCESS' %}true{% endif %}"
+                   href="?status=IN_PROCESS{% if query %}&amp;q={{ query|urlencode }}{% endif %}">IN PROCESS</a>
+                <a class="filter{% if status == 'DELIVERED' %} is-active{% endif %}"
+                   aria-current="{% if status == 'DELIVERED' %}true{% endif %}"
+                   href="?status=DELIVERED{% if query %}&amp;q={{ query|urlencode }}{% endif %}">DELIVERED</a>
+            </nav>
+
+            <form class="search" method="get" action="{% url 'collection' %}" role="search">
+                {% if status %}<input type="hidden" name="status" value="{{ status }}">{% endif %}
+
+                <label class="visually-hidden" for="vehicle-search">Search vehicles</label>
+
+                <svg class="search__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                     stroke-width="2" stroke-linecap="round" aria-hidden="true" focusable="false">
+                    <circle cx="10.5" cy="10.5" r="7"/>
+                    <line x1="15.5" y1="15.5" x2="21" y2="21"/>
+                </svg>
+
+                <input id="vehicle-search"
+                       class="search__input"
+                       type="search"
+                       name="q"
+                       value="{{ query }}"
+                       placeholder="Search BMW ID, model, customer..."
+                       autocomplete="off"
+                       spellcheck="false">
+
+                <button class="search__submit" type="submit">SEARCH</button>
+            </form>
+
+        </div>
+
+        {% comment %}
+            The one scrollable region on the site for this page. Nothing above
+            this element can move, and the empty state is rendered inside it too
+            so a filtered-to-nothing page keeps the same fixed chrome.
+        {% endcomment %}
+        <div class="collection-scroll">
+
+            {% if vehicles %}
+                <ul class="vehicle-grid">
+                    {% for vehicle in vehicles %}
+                        <li class="vehicle-card">
+                            <div class="card-media">
+                                {% if vehicle.image %}
+                                    <img src="{{ vehicle.image.url }}"
+                                         alt="{{ vehicle.model }}"
+                                         loading="lazy"
+                                         decoding="async">
+                                {% else %}
+                                    {% comment %}
+                                        One shared neutral placeholder. Never the
+                                        roundel, never the page background image.
+                                    {% endcomment %}
+                                    <img src="{% static 'images/vehicle-placeholder.svg' %}"
+                                         alt="No photograph available for {{ vehicle.model }}"
+                                         loading="lazy"
+                                         decoding="async">
+                                {% endif %}
+                            </div>
+
+                            <div class="card-body">
+                                <p class="card-id">{{ vehicle.bmw_id }}</p>
+
+                                <h2 class="card-model">{{ vehicle.model }}</h2>
+
+                                <p class="card-meta">
+                                    <span class="card-year">{{ vehicle.year }}</span>
+                                    {% if vehicle.variant %}
+                                        <span class="card-sep" aria-hidden="true">&middot;</span>
+                                        <span class="card-variant">{{ vehicle.variant }}</span>
+                                    {% endif %}
+                                </p>
+
+                                <div class="card-foot">
+                                    <p class="card-price">{{ vehicle.price|inr }}</p>
+                                    <span class="status" data-status="{{ vehicle.status }}">{{ vehicle.get_status_display }}</span>
+                                </div>
+
+                                <a class="card-cta" href="{% url 'vehicle_detail' vehicle.pk %}">
+                                    VIEW DETAILS
+                                    <span class="card-cta__arrow" aria-hidden="true">&rarr;</span>
+                                </a>
+                            </div>
+                        </li>
+                    {% endfor %}
+                </ul>
+            {% else %}
+                <div class="empty-state">
+                    <p class="empty-state__title">NO VEHICLES FOUND</p>
+                    {% if query or status %}
+                        <p class="empty-state__note">Try a different search term or status filter.</p>
+                    {% else %}
+                        {% comment %}
+                            The collection ships empty, so this is the first thing
+                            the owner ever sees. Records are added through this
+                            app's own form, so the note points there rather than
+                            at an admin site this project does not use.
+                        {% endcomment %}
+                        <p class="empty-state__note">The collection is empty. Add your first vehicle and it will appear here.</p>
+                        <a class="btn btn--ghost" href="{% url 'vehicle_add' %}">
+                            ADD BMW VEHICLE
+                            <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+                        </a>
+                    {% endif %}
+                </div>
+            {% endif %}
+
+        </div>
+
+    </main>
+
+{% endblock %}

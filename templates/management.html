@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+{% load static %}
+{% load collection_tags %}
+
+{% block title %}Management | BMW M3 E30{% endblock %}
+
+{% block description %}Add, edit and manage BMW vehicle records.{% endblock %}
+
+{% block content %}
+
+    {% comment %}
+        Management and management ONLY.
+
+        The collection lives on the collection page and nowhere else, so the
+        "BMW COLLECTION MANAGEMENT / VIEW COLLECTION" prose block that used to
+        close this page is gone. It repeated the page's own title and its own
+        primary action immediately below them, and read as a second, redundant
+        collection section inside a page that is not one. A single VIEW
+        COLLECTION link in the panel header is the one way out a manager
+        needs; the panel head carries it.
+
+        The four counters and the table are driven entirely by context the
+        management view was ALREADY passing — total_vehicles, delivered,
+        in_process, pending and the full vehicles queryset. The view is
+        untouched; this template simply stopped ignoring it. No new query, no
+        new field, no migration.
+
+        Each cell carries data-label so the same table can collapse to stacked
+        rows on a tablet using CSS ::before alone. One set of markup, so a
+        vehicle can never appear in the table on one screen and be missing from
+        the card list on another.
+    {% endcomment %}
+    {% comment %}
+        `management-page` is this section's scoping hook. It is the SAME element
+        as `.page--management` -- both classes are on the <main> below -- so
+        nothing about the page's identity changes. It is added only so the fixed
+        frame rules in section 25 of the stylesheet have a name that reads as
+        "this page" rather than "this page modifier", and so every rule that
+        follows is obviously Management-only at a glance.
+
+        Nothing else in this file is edited. The loop, every field, the three
+        action buttons and all four url names are exactly as they were.
+    {% endcomment %}
+    <main class="page page--management management-page">
+        {% comment %}
+            This wrapper still exists and is still in the accessibility tree. It
+            is `display: contents` in section 25, so it generates no box and its
+            three children become flex items of the frame directly -- which is
+            what lets the heading and the statistics hold still while the table
+            body scrolls, with no wrapper of its own to hold a scrollbar.
+        {% endcomment %}
+        <div class="page__scroll">
+
+            <header class="content-header content-header--split">
+                <div class="content-header__text">
+                    <p class="eyebrow">
+                        BMW MANAGEMENT
+                    </p>
+
+                    <h1 class="content-title">
+                        VEHICLE MANAGEMENT
+                    </h1>
+
+                    <p class="content-sub">
+                        Manage your BMW vehicle records.
+                    </p>
+                </div>
+
+                {% comment %}
+                    Reversed by name rather than hardcoded to
+                    /management/vehicle/add/, so the link keeps working if the
+                    prefix is ever moved. This opens the EXISTING Add BMW
+                    Vehicle form — not the Django admin, and not a second form.
+                {% endcomment %}
+                <a
+                    href="{% url 'vehicle_add' %}"
+                    class="btn btn--red content-header__action"
+                >
+                    ADD BMW VEHICLE
+
+                    <span
+                        class="btn__arrow"
+                        aria-hidden="true"
+                    >
+                        &rarr;
+                    </span>
+                </a>
+            </header>
+
+            {% comment %}
+                Counts come from the view's aggregate, so they are the real
+                numbers rather than a count of the rows rendered below — the two
+                differ the moment a filter or a page limit is added.
+            {% endcomment %}
+            <section class="stats" aria-label="Fleet summary">
+                <div class="stat">
+                    <span class="stat__value">{{ total_vehicles }}</span>
+                    <span class="stat__label">TOTAL VEHICLES</span>
+                </div>
+                <div class="stat" data-tone="delivered">
+                    <span class="stat__value">{{ delivered }}</span>
+                    <span class="stat__label">DELIVERED</span>
+                </div>
+                <div class="stat" data-tone="in-process">
+                    <span class="stat__value">{{ in_process }}</span>
+                    <span class="stat__label">IN PROCESS</span>
+                </div>
+                <div class="stat" data-tone="pending">
+                    <span class="stat__value">{{ pending }}</span>
+                    <span class="stat__label">PENDING</span>
+                </div>
+            </section>
+
+            <section class="panel" aria-label="Vehicle records">
+
+                <header class="panel__head">
+                    <h2 class="panel__title">ALL RECORDS</h2>
+
+                    <a class="panel__link" href="{% url 'collection' %}">
+                        VIEW COLLECTION
+                        <span aria-hidden="true">&rarr;</span>
+                    </a>
+                </header>
+
+                {% if vehicles %}
+                    {% comment %}
+                        The ONLY scroll container on this page.
+
+                        `management-records` is the element that scrolls; the
+                        panel head above it ("ALL RECORDS") is outside this box,
+                        and the table's <thead> sticks to the top of it, so both
+                        stay on screen while the rows move underneath.
+
+                        `table-wrap` is kept alongside it so every existing rule
+                        that targets the sideways-scroll wrapper still matches.
+                        Section 25 gives this element `overflow-y: auto;
+                        overflow-x: hidden`, which outranks that older rule.
+
+                        tabindex="0" makes the region reachable by keyboard: a
+                        scrollable container that cannot be focused is one a
+                        keyboard user cannot scroll. role="region" plus the label
+                        give it a name, so it is announced as what it is rather
+                        than as an anonymous group of links.
+                    {% endcomment %}
+                    <div class="table-wrap management-records"
+                         role="region"
+                         aria-label="Vehicle records"
+                         tabindex="0">
+                        <table class="mgmt">
+                            <caption class="visually-hidden">
+                                All BMW vehicle records, with a link to view, edit or delete each one.
+                            </caption>
+
+                            {% comment %}
+                                Every field the Vehicle model actually has is a
+                                column here.
+
+                                "SERIES" from the brief is deliberately absent:
+                                the model has no series field, and inventing one
+                                means a migration, which this task rules out.
+                                IMAGE, VARIANT, CUSTOMER and REGISTRATION were
+                                already on the model and were simply not being
+                                surfaced here — showing them costs no query, no
+                                field and no migration.
+
+                                The thumbnail reuses the collection's image logic
+                                verbatim: the uploaded photo when there is one,
+                                otherwise the one shared neutral placeholder.
+                                Never the roundel, never the homepage hero.
+                            {% endcomment %}
+                            <thead>
+                                <tr>
+                                    <th scope="col" class="mgmt__num-head">#</th>
+                                    <th scope="col">IMAGE</th>
+                                    <th scope="col">BMW ID</th>
+                                    <th scope="col">MODEL</th>
+                                    <th scope="col">VARIANT</th>
+                                    <th scope="col">CUSTOMER</th>
+                                    <th scope="col">REGISTRATION</th>
+                                    <th scope="col">PRICE</th>
+                                    <th scope="col">YEAR</th>
+                                    <th scope="col">STATUS</th>
+                                    <th scope="col" class="mgmt__actions-head">ACTIONS</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+                                {% for vehicle in vehicles %}
+                                    <tr>
+                                        <td data-label="#" class="mgmt__num">{{ forloop.counter }}</td>
+                                        <td data-label="IMAGE" class="mgmt__thumb">
+                                            {% if vehicle.image %}
+                                                <img src="{{ vehicle.image.url }}"
+                                                     alt="{{ vehicle.model }}"
+                                                     loading="lazy"
+                                                     decoding="async">
+                                            {% else %}
+                                                <img src="{% static 'images/vehicle-placeholder.svg' %}"
+                                                     alt="No photograph available for {{ vehicle.model }}"
+                                                     loading="lazy"
+                                                     decoding="async">
+                                            {% endif %}
+                                        </td>
+                                        <td data-label="BMW ID" class="mgmt__id">{{ vehicle.bmw_id }}</td>
+                                        <td data-label="MODEL" class="mgmt__model">{{ vehicle.model }}</td>
+                                        <td data-label="VARIANT" class="mgmt__variant">{{ vehicle.variant|default:"—" }}</td>
+                                        <td data-label="CUSTOMER" class="mgmt__customer">{{ vehicle.customer_name|default:"—" }}</td>
+                                        <td data-label="REGISTRATION" class="mgmt__reg">{{ vehicle.registration_number|default:"—" }}</td>
+                                        <td data-label="PRICE" class="mgmt__price">{{ vehicle.price|inr }}</td>
+                                        <td data-label="YEAR">{{ vehicle.year }}</td>
+                                        <td data-label="STATUS">
+                                            <span class="status" data-status="{{ vehicle.status }}">{{ vehicle.get_status_display }}</span>
+                                        </td>
+                                        <td data-label="" class="mgmt__row-actions">
+                                            <a class="mgmt__act" href="{% url 'vehicle_detail' vehicle.pk %}"
+                                               aria-label="View {{ vehicle.bmw_id }}">VIEW</a>
+                                            <a class="mgmt__act mgmt__act--edit" href="{% url 'vehicle_edit' vehicle.pk %}"
+                                               aria-label="Edit {{ vehicle.bmw_id }}">EDIT</a>
+                                            <a class="mgmt__act mgmt__act--del" href="{% url 'vehicle_delete' vehicle.pk %}"
+                                               aria-label="Delete {{ vehicle.bmw_id }}">DELETE</a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    {% comment %}
+                        Same wording and same exit as the collection's empty
+                        state, so an empty fleet reads as one state across the
+                        site rather than two.
+                    {% endcomment %}
+                    <div class="empty-state empty-state--flush">
+                        <p class="empty-state__title">NO RECORDS YET</p>
+                        <p class="empty-state__note">Add your first vehicle to start managing the collection.</p>
+                        <a class="btn btn--ghost" href="{% url 'vehicle_add' %}">
+                            ADD BMW VEHICLE
+                            <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+                        </a>
+                    </div>
+                {% endif %}
+
+            </section>
+
+        </div>
+    </main>
+
+{% endblock %}

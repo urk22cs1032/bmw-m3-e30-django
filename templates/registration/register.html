@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}Register | BMW M3 E30{% endblock %}
+
+{% block description %}Create a BMW M3 E30 management account.{% endblock %}
+
+{% block head %}
+<style>
+.login-bg {
+    position: fixed;
+    inset: 0;
+
+    width: 100%;
+    height: 100dvh;
+
+    z-index: -1;
+
+    background-image:
+        linear-gradient(
+            rgba(0, 0, 0, 0.12),
+            rgba(0, 0, 0, 0.25)
+        ),
+        url("/static/images/bmw-m3-e30.jpg");
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+
+    filter: brightness(0.9) contrast(1.08) saturate(1.1);
+}
+
+.login-bg::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background: radial-gradient(
+        ellipse at center,
+        rgba(0, 0, 0, 0.05) 0%,
+        rgba(0, 0, 0, 0.18) 75%,
+        rgba(0, 0, 0, 0.30) 100%
+    );
+}
+</style>
+{% endblock %}
+
+{% block body_class %}login-page{% endblock %}
+
+{% block content %}
+    <div class="login-bg" aria-hidden="true"></div>
+    <div class="login-shell login-shell--fixed">
+        <div class="login-card">
+            <div class="login-card__header">
+                <p class="login-eyebrow">BMW MANAGEMENT</p>
+                <h1 class="login-title">CREATE ACCOUNT</h1>
+                <p class="login-sub">Create your account to access vehicle management.</p>
+            </div>
+
+            <form method="post" class="login-form">
+                {% csrf_token %}
+
+                {% if messages %}
+                    <div class="login-errors" role="alert">
+                        <ul>
+                            {% for message in messages %}
+                                <li>{{ message }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endif %}
+
+                {% if form.errors %}
+                    <div class="login-errors" role="alert">
+                        {{ form.non_field_errors }}
+                        {% for field in form %}
+                            {% for error in field.errors %}
+                                <div>{{ error }}</div>
+                            {% endfor %}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+
+                <div class="login-field">
+                    <label for="id_username">USERNAME</label>
+                    <div class="login-input-wrapper">
+                        <span class="login-input__icon" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="login-icon">
+                                <path d="M12 12C14.7614 12 17 9.76142 17 7C17 4.23858 14.7614 2 12 2C9.23858 2 7 4.23858 7 7C7 9.76142 9.23858 12 12 12Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M20.5899 22C20.5899 18.13 16.7399 15 11.9999 15C7.25991 15 3.40991 18.13 3.40991 22" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        <input type="text" name="username" id="id_username" class="login-input login-input--with-icon" placeholder="Enter username" required autofocus>
+                    </div>
+                </div>
+
+                <div class="login-field">
+                    <label for="id_email">EMAIL</label>
+                    <div class="login-input-wrapper">
+                        <span class="login-input__icon" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="login-icon">
+                                <path d="M4 4H20C21.1 4 22 4.9 22 6V18C22 19.1 21.1 20 20 20H4C2.9 20 2 19.1 2 18V6C2 4.9 2.9 4 4 4Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M22 6L12 13L2 6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        <input type="email" name="email" id="id_email" class="login-input login-input--with-icon" placeholder="Enter email" required>
+                    </div>
+                </div>
+
+                <div class="login-field">
+                    <label for="id_password1">PASSWORD</label>
+                    <div class="login-input-wrapper">
+                        <span class="login-input__icon" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="login-icon">
+                                <path d="M6 10V8C6 4.69 7 2 12 2C17 2 18 4.69 18 8V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 18.5C13.3807 18.5 14.5 17.3807 14.5 16C14.5 14.6193 13.3807 13.5 12 13.5C10.6193 13.5 9.5 14.6193 9.5 16C9.5 17.3807 10.6193 18.5 12 18.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M17 22H7C3 22 2 21 2 17V15C2 11 3 10 7 10H17C21 10 22 11 22 15V17C22 21 21 22 17 22Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        <input type="password" name="password1" id="id_password1" class="login-input login-input--with-icon" placeholder="Enter password" required>
+                    </div>
+                </div>
+
+                <div class="login-field">
+                    <label for="id_password2">CONFIRM PASSWORD</label>
+                    <div class="login-input-wrapper">
+                        <span class="login-input__icon" aria-hidden="true">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" class="login-icon">
+                                <path d="M6 10V8C6 4.69 7 2 12 2C17 2 18 4.69 18 8V10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M12 18.5C13.3807 18.5 14.5 17.3807 14.5 16C14.5 14.6193 13.3807 13.5 12 13.5C10.6193 13.5 9.5 14.6193 9.5 16C9.5 17.3807 10.6193 18.5 12 18.5Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M17 22H7C3 22 2 21 2 17V15C2 11 3 10 7 10H17C21 10 22 11 22 15V17C22 21 21 22 17 22Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </span>
+                        <input type="password" name="password2" id="id_password2" class="login-input login-input--with-icon" placeholder="Enter password again" required>
+                    </div>
+                </div>
+
+                <button type="submit" class="login-btn">
+                    REGISTER <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+                </button>
+
+                <div class="login-divider">
+                    <span>OR</span>
+                </div>
+
+                <div class="login-footer">
+                    <p>Already have an account? <a href="{% url 'login' %}">LOGIN</a></p>
+                    <a class="login-link" href="{% url 'home' %}">&larr; Back to Home</a>
+                </div>
+            </form>
+        </div>
+    </div>
+{% endblock %}

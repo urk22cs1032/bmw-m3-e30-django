@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load collection_tags %}
+
+{% comment %}
+    Delete confirmation. Rendered by showroom.views.vehicle_delete on GET; the
+    view only performs the delete on POST, so simply arriving at this URL can
+    never destroy the record.
+
+    The record is named explicitly rather than saying "this item", because a
+    destructive action has to be unambiguous about what it is about to remove.
+{% endcomment %}
+
+{% block title %}Delete {{ vehicle.bmw_id }} | BMW M3 E30{% endblock %}
+
+{% block description %}Confirm permanent deletion of {{ vehicle.bmw_id }}.{% endblock %}
+
+{% block content %}
+
+    <main class="page page--confirm">
+        <div class="page__scroll">
+
+        <div class="v-danger">
+
+            <p class="eyebrow">
+                CONFIRM DELETION
+            </p>
+
+            <h1 class="v-danger__title">
+                DELETE {{ vehicle.bmw_id|upper }}?
+            </h1>
+
+            <p class="v-danger__lede">
+                This permanently removes
+                <strong>{{ vehicle.model }} ({{ vehicle.year }})</strong>
+                {% if vehicle.registration_number %}
+                    &mdash; {{ vehicle.registration_number }}
+                {% endif %}
+                from the collection. It cannot be undone, and any uploaded photo
+                is deleted with the record.
+            </p>
+
+            <div class="v-danger__card">
+                <dl class="detail-grid">
+                    <div class="detail-field">
+                        <dt class="detail-field__label">BMW ID</dt>
+                        <dd class="detail-field__value">{{ vehicle.bmw_id }}</dd>
+                    </div>
+                    <div class="detail-field">
+                        <dt class="detail-field__label">MODEL</dt>
+                        <dd class="detail-field__value">{{ vehicle.model }}</dd>
+                    </div>
+                    <div class="detail-field">
+                        <dt class="detail-field__label">YEAR</dt>
+                        <dd class="detail-field__value">{{ vehicle.year }}</dd>
+                    </div>
+                    <div class="detail-field">
+                        <dt class="detail-field__label">PRICE</dt>
+                        <dd class="detail-field__value">{{ vehicle.price|inr }}</dd>
+                    </div>
+                </dl>
+            </div>
+
+            {% comment %}
+                POST, not GET. A deletion reachable by link, prefetch or a
+                crawler is a deletion that happens by accident.
+            {% endcomment %}
+            <form method="post" class="v-danger__actions">
+                {% csrf_token %}
+
+                <button type="submit" class="btn btn--danger">
+                    DELETE {{ vehicle.bmw_id|upper }}
+                    <span class="btn__arrow" aria-hidden="true">&rarr;</span>
+                </button>
+
+                {% comment %}
+                    Cancels to the record rather than the collection: a visitor
+                    who opened this from a card is already looking at that
+                    vehicle, so back is the shortest way to where they were.
+                {% endcomment %}
+                <a class="btn btn--ghost" href="{% url 'vehicle_detail' vehicle.pk %}">
+                    CANCEL
+                </a>
+            </form>
+
+        </div>
+
+        </div>
+    </main>
+
+{% endblock %}

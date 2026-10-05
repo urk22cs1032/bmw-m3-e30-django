@@ -1,0 +1,206 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block title %}About | BMW M3 E30{% endblock %}
+
+{% block description %}
+The BMW M3 E30 — one of the most iconic chapters in BMW Motorsport history.
+{% endblock %}
+
+{% block head %}
+<style>
+    /* =========================================================
+   ABOUT PAGE
+   ========================================================= */
+
+    .page--about {
+        position: relative;
+
+        width: 100%;
+        height: 100dvh;
+        min-height: 100dvh;
+
+        overflow: hidden;
+    }
+
+    /* =========================================================
+   BMW BACKGROUND
+   ========================================================= */
+
+    .page--about::before {
+        content: "";
+
+        position: fixed;
+        inset: 0;
+
+        width: 100%;
+        height: 100dvh;
+
+        background-image: linear-gradient(rgba(0, 0, 0, 0.10),
+            rgba(0, 0, 0, 0.22)),
+        url("{% static 'images/bmw-m3-e30.jpg' %}");
+
+        background-size: cover;
+        background-position: center;
+        background-repeat: no-repeat;
+
+        filter:
+            brightness(0.9) contrast(1.08) saturate(1.1);
+
+        z-index: -2;
+    }
+
+    /* =========================================================
+   SUBTLE OVERLAY
+   ========================================================= */
+
+    .page--about::after {
+        content: "";
+
+        position: fixed;
+        inset: 0;
+
+        background: radial-gradient(ellipse at center,
+                rgba(0, 0, 0, 0.03) 0%,
+                rgba(0, 0, 0, 0.12) 70%,
+                rgba(0, 0, 0, 0.25) 100%);
+
+        z-index: -1;
+
+        pointer-events: none;
+    }
+
+    /* =========================================================
+   FIXED ABOUT CONTENT
+   ========================================================= */
+
+    .page--about .page__scroll {
+        width: 100%;
+        height: calc(100dvh - 80px);
+
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+
+        box-sizing: border-box;
+
+        padding: 20px 0;
+
+        overflow: hidden;
+    }
+
+    /* =========================================================
+   HEADER
+   ========================================================= */
+
+    .page--about .content-header {
+        margin-bottom: 18px;
+    }
+
+    /* =========================================================
+   ABOUT FRAME
+   ========================================================= */
+
+    .page--about .about-frame {
+        max-height: 500px;
+
+        overflow: hidden;
+
+        box-sizing: border-box;
+    }
+
+    /* =========================================================
+   MOBILE
+   ========================================================= */
+
+    @media (max-width: 768px) {
+
+        .page--about .page__scroll {
+            height: calc(100dvh - 70px);
+
+            padding: 16px;
+        }
+
+        .page--about .content-header {
+            margin-bottom: 14px;
+        }
+
+        .page--about .about-frame {
+            max-height: calc(100dvh - 190px);
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<main class="page page--about">
+
+    <div class="page__scroll">
+
+        <!-- PAGE HEADER -->
+        <header class="content-header">
+
+            <p class="eyebrow">
+                BMW MOTORSPORT
+            </p>
+
+            <h1 class="content-title">
+                ABOUT BMW M3 E30
+            </h1>
+
+            <p class="content-sub">
+                A LEGEND IN MOTORSPORT HISTORY
+            </p>
+
+        </header>
+
+
+        <!-- ABOUT CONTENT -->
+        <section class="about-frame">
+
+            <h2 class="about-frame__title">
+                Born from motorsport, built for the road
+            </h2>
+
+            <div class="prose">
+
+                <p>
+                    The BMW M3 E30 represents one of the most iconic
+                    chapters in BMW Motorsport history. Born from
+                    motorsport and developed with performance at its core,
+                    it became a symbol of BMW's performance heritage.
+                </p>
+
+                <p>
+                    The E30 M3 was developed for competition and
+                    road-going performance, combining a lightweight
+                    chassis with the high-revving S14 four-cylinder
+                    engine and motorsport-focused engineering.
+                </p>
+
+                <p>
+                    This project brings that heritage into a modern
+                    digital showroom, providing a clean way to explore
+                    and manage BMW vehicle records.
+                </p>
+
+                <a class="btn" href="{% url 'collection' %}">
+
+                    VIEW COLLECTION
+
+                    <span class="btn__arrow" aria-hidden="true">
+                        &rarr;
+                    </span>
+
+                </a>
+
+            </div>
+
+        </section>
+
+    </div>
+
+</main>
+
+{% endblock %}
